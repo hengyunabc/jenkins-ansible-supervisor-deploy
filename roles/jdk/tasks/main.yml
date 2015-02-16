@@ -1,0 +1,9 @@
+- name: Install  jdk  (Debian based)
+  apt: name={{ jdk_version }} state=present
+  when:  ansible_pkg_mgr == "apt"
+  sudo: yes
+
+- name: Install  jdk (RedHat based)
+  yum: name={{ jdk_version }} state=present
+  when:  ansible_pkg_mgr == "yum"
+  sudo: yes

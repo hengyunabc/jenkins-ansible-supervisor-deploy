@@ -1,0 +1,41 @@
+
+- name: add group '{{ tomcat_user }}'
+  group: name={{tomcat_group}}
+  sudo: True
+
+- name: add user '{{ tomcat_user }}'
+  user: name={{tomcat_user}} group={{tomcat_group}}
+  sudo: True
+
+- name: create tomcat directory ' {{ deploy_path }} '
+  file: path={{deploy_path}} state=directory owner={{tomcat_user}} group={{tomcat_group}} 
+
+- name: Download Tomcat
+  get_url: url={{tomcat_mirrors}}/tomcat/{{tomcat_major_version}}/v{{tomcat_version}}/bin/apache-tomcat-{{tomcat_version}}.tar.gz  dest={{deploy_path}}/apache-tomcat-{{tomcat_version}}.tar.gz
+
+- stat: path={{deploy_path}}/tomcat-{{app}}
+  register: tomcat_path_register
+
+- name: Extract archive
+  command: chdir=/usr/share /bin/tar xvf {{deploy_path}}/apache-tomcat-{{tomcat_version}}.tar.gz -C {{deploy_path}} creates={{deploy_path}}/apache-tomcat-{{tomcat_version}}
+  when: tomcat_path_register.stat.exists == False
+
+- name: change tomcat directory name
+  command: chdir=/usr/share /bin/mv {{deploy_path}}/apache-tomcat-{{tomcat_version}} {{deploy_path}}/tomcat-{{app}} creates={{deploy_path}}/tomcat-{{app}}
+
+- name: Change ownership of Tomcat installation
+  file: path={{deploy_path}}/tomcat-{{app}} owner={{tomcat_user}} group={{tomcat_group}} state=directory recurse=yes
+
+- name: Configure Tomcat server
+  template: src=server.xml dest={{deploy_path}}/tomcat-{{app}}/conf/
+#  notify: restart tomcat
+
+- name: Configure Tomcat setenv.sh
+  template: src=setenv.sh dest={{deploy_path}}/tomcat-{{app}}/bin/
+#  notify: restart tomcat
+
+- name: Configure  tomcat-control.sh
+  template: src=tomcat-control.sh dest={{deploy_path}}/tomcat-{{app}}/bin/
+
+- name: add supervisor config
+  template: src=tomcat-supervisor.ini dest={{ supervisor_conf_root }}/conf.d/tomcat-{{app}}.ini

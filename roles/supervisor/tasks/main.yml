@@ -1,0 +1,57 @@
+
+---
+#- name: Display all variables/facts known for a host
+#  debug: var=hostvars[inventory_hostname]
+
+- name: Install python-pip (Debian based)
+  apt: name={{ item }}  state=present
+  with_items:
+#   - build-essential
+#  - python-dev
+   - python-pip
+  when:  ansible_pkg_mgr == "apt"
+  sudo: yes
+
+- name: Update  ca-certificates (RedHat based)
+  yum: name=ca-certificates disablerepo=epel
+  when:  ansible_pkg_mgr == "yum"
+  sudo: yes
+
+- name: Install python-pip (RedHat based)
+  yum: name={{ item }}  state=present
+  with_items:
+   - epel-release
+   - python-pip
+  when:  ansible_pkg_mgr == "yum"
+  sudo: yes
+
+- name: pip install supervisor 
+  command: pip install supervisor
+
+- name: add supervisor service
+  template: src=supervisor-ubuntu.sh dest=/etc/init.d/{{ supervisor_service_name }} mode=0755
+  sudo: yes
+  when: ansible_os_family == "Debian"
+
+- name: add supervisor service
+  template: src=supervisor-redhat.sh dest=/etc/init.d/{{ supervisor_service_name }} mode=0755
+  sudo: yes
+  when: ansible_os_family == "RedHat"
+
+- name: create supervisor conf directory 
+  file: path={{supervisor_conf_root}} state=directory 
+
+- name: create supervisor conf directory 
+  file: path={{supervisor_conf_root}}/conf.d state=directory 
+
+- name: add supervisor conf file
+  template: src=supervisord.conf dest={{ supervisor_conf_root }}
+  notify: restart supervisor
+  sudo: yes
+
+- name: enable supervisor service,
+  service: name="{{ supervisor_service_name }}" enabled=yes
+
+- name: start service supervisor, if not running
+  service: name="{{ supervisor_service_name }}" state=started
+

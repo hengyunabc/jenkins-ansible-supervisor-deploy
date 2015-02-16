@@ -1,0 +1,27 @@
+---
+# This playbook deploys a simple standalone Tomcat 7 server. 
+
+- hosts: '{{target_host}}'
+  user: root
+  vars: 
+    jdk_version: openjdk-7-jdk
+    tomcat_mirrors: http://mirrors.hust.edu.cn/apache
+    tomcat_major_version: tomcat-7
+    tomcat_version: 7.0.59
+    #supervisord_conf_path: /opt/python27env/supervisor/conf.d
+    #ansible_python_interpreter: /opt/python27env/bin/python
+    tomcat_group: www
+    tomcat_user: www
+    supervisor_service_name: supervisor
+    supervisor_conf_root: '/etc/supervisor'
+    supervisor_http_host: 0.0.0.0
+    supervisor_http_port: 9001
+    supervisor_http_user_name: admin
+    supervisor_http_user_password: admin
+  roles:
+#    - selinux
+    - jdk
+    - supervisor
+    - tomcat
+    - deploy-war
+
