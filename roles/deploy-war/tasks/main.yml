@@ -6,21 +6,18 @@
   shell: rm -rf {{deploy_path}}/tomcat-{{app}}/webapps/ROOT {{deploy_path}}/tomcat-{{app}}/webapps/ROOT.war
   sudo: True
 
-#- name: copy app war to tomcat/webapps
-#  copy: src=/build/{{app}}/{{deploy_tag}} dest=/opt/tomcat-{{app}}/webapps
-
 - name: copy app war to tomcat/webapps
   copy: src={{ item }} dest={{deploy_path}}/tomcat-{{app}}/webapps/ROOT.war owner={{tomcat_user}}
   with_fileglob:
     - "{{deploy_war_path}}/*.war"
-#    - /build/spring-mvc-showcase-daily/2014-12-01_10-42-35_5_default/*.war
-#    -/build/spring-mvc-showcase-daily/2014-12-01_10-42-35_5_default/*.war
-    #-{{deploy_war_path}}/*.war
 
 - name: Change ownership of Tomcat webapps/ROOT.war
   file: path={{deploy_path}}/tomcat-{{app}}/webapps/ROOT.war owner={{tomcat_user}} group={{tomcat_group}}
 
-- name: Start Tomcat
+- name: supervisor add tomcat service
+  supervisorctl: name=tomcat-{{app}} state=present
+
+- name: supervisor start tomcat service
   supervisorctl: name=tomcat-{{app}} state=started
 
 - name: wait for tomcat to start
