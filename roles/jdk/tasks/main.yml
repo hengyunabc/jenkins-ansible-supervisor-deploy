@@ -1,5 +1,5 @@
 - name: Install  jdk  (Debian based)
-  apt: name=openjdk-7-jdk state=present 
+  apt: name=openjdk-7-jdk state=present
   when:  ansible_pkg_mgr == "apt"
   sudo: yes
 
