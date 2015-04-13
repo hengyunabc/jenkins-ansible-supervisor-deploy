@@ -15,7 +15,7 @@
   file: path={{deploy_path}}/tomcat-{{app}}/webapps/ROOT.war owner={{tomcat_user}} group={{tomcat_group}}
 
 - name: supervisor add tomcat service
-  supervisorctl: name=tomcat-{{app}} state=present
+  supervisorctl: name=tomcat-{{app}} state=present username=admin password=admin
 
 - name: supervisor start tomcat service
   supervisorctl: name=tomcat-{{app}} state=started
