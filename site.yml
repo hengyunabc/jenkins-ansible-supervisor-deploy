@@ -4,12 +4,12 @@
 - hosts: '{{target_host}}'
   user: root
   vars: 
-    jdk_version: java-1.7.0-openjdk
+    # jdk_version: java-1.7.0-openjdk
     tomcat_mirrors: http://mirrors.cnnic.cn/apache
     tomcat_major_version: tomcat-7
     tomcat_version: 7.0.61
-    #supervisord_conf_path: /opt/python27env/supervisor/conf.d
-    #ansible_python_interpreter: /opt/python27env/bin/python
+    # supervisord_conf_path: /opt/python27env/supervisor/conf.d
+    # ansible_python_interpreter: /opt/python27env/bin/python
     tomcat_group: www
     tomcat_user: www
     supervisor_service_name: supervisor
